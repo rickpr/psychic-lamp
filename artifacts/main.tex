@@ -1,10 +1,40 @@
 \documentclass{article}
+\usepackage{amsmath}
 \begin{document}
-\section{Getting angles}
+\section{Setting up the problem}
 We have three angles, \(x\), \(y\) and \(z\). These can be represented as three
 components of a vector:
 \[ r = \left\langle x, y, z \right\rangle \]
 
 The magnitude of this vector should be \emph{approximately} equal to the
-acceleration due to gravity, \(9.8{\text{m/s}}^2\).
+acceleration due to gravity, \(9.8{\mbox{m/s}}^2\). I can compute the magnitude
+of the vector as follows:
+
+\[ |r| = \sqrt{x^2 + y^2 + z^2} \]
+
+In case the magnitude of the vector is different than the acceleration due to
+gravity, we should use this value instead. Also, we should report if this value
+is outside of some sort of tolerance. Perhaps we'll be a bit liberal on this and
+use a value of about 10\%.
+
+In order to find the angle of the panel, we'll want to reparameterize this in
+spherical coordinates.
+\begin{align*}
+  \rho = \sqrt{x^2 + y^2 + z^2} \\
+  \theta = \arctan\left(\frac{y}{x}\right) \\
+  \phi = \arctan \frac{\sqrt{x^2 + y^2}}{z}
+\end{align*}
+
+These two angles will correspond to the direction the tracker is pointing.
+
+\section{Using the sun data}
+
+We can setup and calibrate the tracker using the highest position in the sky of
+the sun, which will be at 1:00 PM on the day of the competition. This means the
+tracker will have a permanently fixed axis at a downard angle of \(17.01\)
+degrees, and will be pointed toward 197.9 degrees on a compass heading. We will
+calibrate, if necessary, an offset for \(\theta\) that corresponds to \(\theta =
+0\) in this position. Then, the only variable we have to worry about is
+\(\phi\)! We can set the tracker to detect \(\theta\) as a quality control, and
+use the magnetometer as another check.
 \end{document}

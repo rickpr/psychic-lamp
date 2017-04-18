@@ -2,4 +2,3 @@
 artifacts/*.aux
 artifacts/*.dvi
 artifacts/*.log
-artifacts/*.pdf
