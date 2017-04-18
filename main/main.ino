@@ -26,6 +26,7 @@
 #include <sstream>
 #include <string>
 #include "time_and_angle.h"
+#include "data.h"
 Servo myservo; // Create servo object to control a servo
 // Assign a unique ID to this sensor at the same time
 Adafruit_LSM303_Accel_Unified accel = Adafruit_LSM303_Accel_Unified(76527);
@@ -130,10 +131,11 @@ void loop() {
      will remain stationary.
    */
 
-  if(phi - ) { // If the sunlight intensity is higher on the west side of the panel
+  if(phi - angles[current_increment] < 5) { // If the angle is greater than phi
     myservo.writeMicroseconds(2000); // Full speed forwards (2000) signal pushing the solar panel to the left(west)
     delay(500); //0.5 seconds
-  } else if(solar_input_east - solar_input_east > 20) { // If the sunlight intensity is higher on the east side of the panel
+  } else if(phi - angles[current_increment] > 5) { // If the angle is greater
+than phi
     myservo.writeMicroseconds(1000); // Full speed backwards (1000) signal pulling the solar panel to the right(east)
     delay(500); //0.5 seconds
   } else { // If the sunlight intensity is similar from both side of the panel
