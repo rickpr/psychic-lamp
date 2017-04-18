@@ -22,9 +22,6 @@
 #include <Wire.h>
 #include "Adafruit_Sensor.h"
 #include "Adafruit_LSM303_U.h"
-#include <fstream>
-#include <sstream>
-#include <string>
 #include "time_and_angle.h"
 #include "data.h"
 Servo myservo; // Create servo object to control a servo
@@ -38,8 +35,6 @@ Adafruit_LSM303_Accel_Unified accel = Adafruit_LSM303_Accel_Unified(76527);
 
 const int WASP_Power  = 10; // Assign pin 10 to Power for the WASP
 const int WASP_Ground = 11; // Assign pin 11 to Ground for the WASP
-// const int sensor_west_pin1 =  7; // A7 pin 6 sensor input 1 west
-// const int sensor_east_pin2 =  8; // A8 pin 8 sensor input 2 east
 
 /*
  * VARIABLE DECLARATION
@@ -74,12 +69,8 @@ void setup() {
   DateTime.sync(0);
 }
 
-std::ifstream infile("sun.csv");
-std::string line;
 double current_time   = 0;
 int current_increment = 0;
-float current_angle = angles[current_increment];
-getline(infile, line);
 update_time(&current_increment);
 double phi;
 
@@ -134,8 +125,7 @@ void loop() {
   if(phi - angles[current_increment] < 0.1) { // If the angle is greater than phi
     myservo.writeMicroseconds(2000); // Full speed forwards (2000) signal pushing the solar panel to the left(west)
     delay(500); //0.5 seconds
-  } else if(phi - angles[current_increment] > 0.1) { // If the angle is greater
-than phi
+  } else if(phi - angles[current_increment] > 0.1) { // If the angle is greater than phi
     myservo.writeMicroseconds(1000); // Full speed backwards (1000) signal pulling the solar panel to the right(east)
     delay(500); //0.5 seconds
   } else { // If the sunlight intensity is similar from both side of the panel
