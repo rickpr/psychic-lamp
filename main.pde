@@ -19,7 +19,7 @@
    Include the Servo library and create the servo object.
  */
 
-#include
+#include <Servo.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_LSM303_U.h>
