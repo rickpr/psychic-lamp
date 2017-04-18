@@ -20,7 +20,7 @@
 
 #include <Servo.h>
 #include <Wire.h>
-#include "DateTime/DateTime.h"
+#include <DateTime.h>
 #include "Adafruit_Sensor.h"
 #include "Adafruit_LSM303_U.h"
 #include "time_and_angle.h"

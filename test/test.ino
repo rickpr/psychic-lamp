@@ -15,7 +15,6 @@
 
 #include <Servo.h>
 #include <Wire.h>
-#include <string>
 Servo myservo; // Create servo object to control a servo
 
 /*
