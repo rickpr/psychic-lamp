@@ -20,8 +20,8 @@
 
 #include <Servo.h>
 #include <Wire.h>
-#include <Adafruit_Sensor.h>
-#include <Adafruit_LSM303_U.h>
+#include "Adafruit_Sensor.h"
+#include "Adafruit_LSM303_U.h"
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -35,8 +35,8 @@ Adafruit_LSM303_Accel_Unified accel = Adafruit_LSM303_Accel_Unified(76527);
  * Assign pins from WASP Controller and Arduino Micro to appropriate variable.
  */
 
-const int WASP_Power       = 10; // Assign pin 10 to Power for the WASP
-const int WASP_Ground      = 11; // Assign pin 11 to Ground for the WASP
+const int WASP_Power  = 10; // Assign pin 10 to Power for the WASP
+const int WASP_Ground = 11; // Assign pin 11 to Ground for the WASP
 // const int sensor_west_pin1 =  7; // A7 pin 6 sensor input 1 west
 // const int sensor_east_pin2 =  8; // A8 pin 8 sensor input 2 east
 
@@ -75,19 +75,12 @@ void setup() {
 
 std::ifstream infile("sun.csv");
 std::string line;
-int current_time[3]; //HMS
-int file_time[3]; //HMS
+double current_time   = 0;
+int current_increment = 0;
+float current_angle = angles[current_increment];
 getline(infile, line);
-update_time(file_time);
+update_time(&current_increment);
 double phi;
-
-void advance_line() {
-  clock_time(DateTime.now(), current_time)
-    if check_time(current_time, file_time) {
-      getline(infile, line);
-      update_time(file_time);
-    }
-}
 
 void loop() {
 
@@ -137,7 +130,7 @@ void loop() {
      will remain stationary.
    */
 
-  if(solar_input_west - solar_input_east > 20) { // If the sunlight intensity is higher on the west side of the panel
+  if(phi - ) { // If the sunlight intensity is higher on the west side of the panel
     myservo.writeMicroseconds(2000); // Full speed forwards (2000) signal pushing the solar panel to the left(west)
     delay(500); //0.5 seconds
   } else if(solar_input_east - solar_input_east > 20) { // If the sunlight intensity is higher on the east side of the panel
