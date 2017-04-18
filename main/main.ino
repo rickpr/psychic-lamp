@@ -20,10 +20,11 @@
 
 #include <Servo.h>
 #include <Wire.h>
+#include "DateTime/DateTime.h"
 #include "Adafruit_Sensor.h"
 #include "Adafruit_LSM303_U.h"
 #include "time_and_angle.h"
-#include "data.h"
+
 Servo myservo; // Create servo object to control a servo
 // Assign a unique ID to this sensor at the same time
 Adafruit_LSM303_Accel_Unified accel = Adafruit_LSM303_Accel_Unified(76527);
@@ -59,8 +60,6 @@ void setup() {
   pinMode(WASP_Ground, OUTPUT);     // Set Ground to output
   digitalWrite(WASP_Power, HIGH);   // Set 5V to pin 10
   digitalWrite(WASP_Ground, LOW);   // Set GND to pin 11
-  pinMode(sensor_west_pin1, INPUT); // Set sensor west pin to input
-  pinMode(sensor_east_pin2, INPUT); // Set sensor east pin to input
   // Initialize the sensor
   if(!accel.begin()) {
     exit(1);
@@ -71,10 +70,10 @@ void setup() {
 
 double current_time   = 0;
 int current_increment = 0;
-update_time(&current_increment);
 double phi;
 
 void loop() {
+  current_increment += check_time(current_increment);
 
   /*
    * SENSOR READINGS
@@ -108,8 +107,8 @@ void loop() {
   x /= number_of_samples; // Final value for x-axis
   y /= number_of_samples; // Final value for y-axis
   z /= number_of_samples; // Final value for z-axis
-  phi = arctan(sqrt(x * x + y * y) / z);
-  theta = arctan(y / x);
+  phi = atan(sqrt(x * x + y * y) / z);
+  theta = atan(y / x);
   rho = sqrt(x * x + y * y + z * z);
 
   /*
@@ -122,10 +121,10 @@ void loop() {
      will remain stationary.
    */
 
-  if(phi - angles[current_increment] < 0.1) { // If the angle is greater than phi
+  if(phi - sun_angles[current_increment] < 0.1) { // If the angle is greater than phi
     myservo.writeMicroseconds(2000); // Full speed forwards (2000) signal pushing the solar panel to the left(west)
     delay(500); //0.5 seconds
-  } else if(phi - angles[current_increment] > 0.1) { // If the angle is greater than phi
+  } else if(phi - sun_angles[current_increment] > 0.1) { // If the angle is greater than phi
     myservo.writeMicroseconds(1000); // Full speed backwards (1000) signal pulling the solar panel to the right(east)
     delay(500); //0.5 seconds
   } else { // If the sunlight intensity is similar from both side of the panel
