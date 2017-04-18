@@ -11,7 +11,6 @@
    1 x WASP Motor Controller
    1 x PA-09-12-300 Linear Actuator
    1 x Adafruit LSM303
-   2 x 7k ohm Resistors
  */
 /*
    SERVO LIBRARY
