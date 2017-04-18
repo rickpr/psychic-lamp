@@ -131,10 +131,10 @@ void loop() {
      will remain stationary.
    */
 
-  if(phi - angles[current_increment] < 1) { // If the angle is greater than phi
+  if(phi - angles[current_increment] < 0.1) { // If the angle is greater than phi
     myservo.writeMicroseconds(2000); // Full speed forwards (2000) signal pushing the solar panel to the left(west)
     delay(500); //0.5 seconds
-  } else if(phi - angles[current_increment] > 1) { // If the angle is greater
+  } else if(phi - angles[current_increment] > 0.1) { // If the angle is greater
 than phi
     myservo.writeMicroseconds(1000); // Full speed backwards (1000) signal pulling the solar panel to the right(east)
     delay(500); //0.5 seconds
