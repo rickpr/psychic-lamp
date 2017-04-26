@@ -20,7 +20,7 @@
 
 #include <Servo.h>
 #include <Wire.h>
-#include <DateTime.h>
+#include <Time.h>
 #include "Adafruit_Sensor.h"
 #include "Adafruit_LSM303_U.h"
 #include "time_and_angle.h"
@@ -65,7 +65,6 @@ void setup() {
     exit(1);
   }
   Serial.begin(57600);
-  DateTime.sync(0);
 }
 
 double current_time   = 0;
