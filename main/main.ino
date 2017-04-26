@@ -68,11 +68,14 @@ void setup() {
 }
 
 double current_time   = 0;
-int current_increment = 0;
+int current_increment = check_time();
+boolean afternoon = false;
 double phi;
 
 void loop() {
-  current_increment += check_time(current_increment);
+  current_increment = check_time();
+  if(current_increment >= 16)
+    afternoon = true;
 
   /*
    * SENSOR READINGS
@@ -120,7 +123,7 @@ void loop() {
      will remain stationary.
    */
 
-  if(phi - sun_angles[current_increment] < 0.1) { // If the angle is greater than phi
+  if(phi - sun_angles[current_increment] < -0.1) { // If the angle is greater than phi
     myservo.writeMicroseconds(2000); // Full speed forwards (2000) signal pushing the solar panel to the left(west)
     delay(500); //0.5 seconds
   } else if(phi - sun_angles[current_increment] > 0.1) { // If the angle is greater than phi
