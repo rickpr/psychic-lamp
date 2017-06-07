@@ -74,8 +74,8 @@ void setup() {
     exit(1);
 
   Serial.begin(57600);
-  calibrate_end();
-  calibrate_start();
+  double final_phi = calibrate_end(accel);
+  double start_phi = calibrate_start(accel);
 }
 
 void loop() {
