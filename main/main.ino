@@ -24,8 +24,9 @@
 #include "Adafruit_Sensor.h"
 #include "Adafruit_LSM303_U.h"
 #include "time_and_angle.h"
+#include "calibrate.h"
 
-Servo myservo; // Create servo object to control a servo
+// Servo myservo; // Create servo object to control a servo
 // Assign a unique ID to this sensor at the same time
 Adafruit_LSM303_Accel_Unified accel = Adafruit_LSM303_Accel_Unified(76527);
 
@@ -65,6 +66,8 @@ void setup() {
     exit(1);
   }
   Serial.begin(57600);
+  calibrate_end();
+  calibrate_start();
 }
 
 double current_time   = 0;
@@ -109,9 +112,7 @@ void loop() {
   x /= number_of_samples; // Final value for x-axis
   y /= number_of_samples; // Final value for y-axis
   z /= number_of_samples; // Final value for z-axis
-  phi = atan(sqrt(x * x + y * y) / z);
-  theta = atan(y / x);
-  rho = sqrt(x * x + y * y + z * z);
+  phi = vectors_to_phi(x, y, z);
 
   /*
      SOLAR PANEL MOVEMENT
@@ -124,13 +125,11 @@ void loop() {
    */
 
   if(phi - sun_angles[current_increment] < -0.1) { // If the angle is greater than phi
-    myservo.writeMicroseconds(2000); // Full speed forwards (2000) signal pushing the solar panel to the left(west)
-    delay(500); //0.5 seconds
+    forward(500); // Full speed forwards signal pushing the solar panel to the left(west) for 0.5 seconds
   } else if(phi - sun_angles[current_increment] > 0.1) { // If the angle is greater than phi
-    myservo.writeMicroseconds(1000); // Full speed backwards (1000) signal pulling the solar panel to the right(east)
-    delay(500); //0.5 seconds
+    backward(500); // Full speed backwards signal pulling the solar panel to the right(east) for 0.5 seconds
   } else { // If the sunlight intensity is similar from both side of the panel
-    myservo.writeMicroseconds(1520); // Stationary (1520) signal stop the solar panel from moving
+    stop(500); // Stationary signal stop the solar panel from moving
   }
   delay(solar_panel_adjustment_interval); // Delay before another adjustment will be made
 }
