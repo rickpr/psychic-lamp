@@ -11,9 +11,11 @@ void stop() {
 void forward(long long int microseconds) {
   myservo.writeMicroseconds(FORWARD);
   delay(microseconds);
+  stop();
 }
 
 void reverse(long long int microseconds) {
   myservo.writeMicroseconds(REVERSE);
   delay(microseconds);
+  stop();
 }

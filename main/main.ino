@@ -23,6 +23,7 @@
 #include <Time.h>
 #include "Adafruit_Sensor.h"
 #include "Adafruit_LSM303_U.h"
+#include "movement_helpers.h"
 #include "time_and_angle.h"
 #include "calibrate.h"
 
@@ -49,6 +50,13 @@ int accel_y[number_of_samples]; // 10 y-axis samples
 int accel_z[number_of_samples]; // 10 z-axis samples
 const int sample_time_interval = 10000; // Change this value to set the interval between each sample is taken (ms)
 const long solar_panel_adjustment_interval = 600000; // Change this value to set the interval between each adjustment from the solar panel (ms)
+const int initial_adjustment_time = 512; // The amount of time to move the panel the first time to aim for the correct angle
+const float threshold = 0.1; // The amount of radians considered to be within the target range
+const int give_up = 100; // The amount of times to attempt to correct the angle before giving up
+
+double current_time  = 0;
+int current_increment = check_time();
+bool afternoon = false;
 
 void setup() {
   /*
@@ -62,18 +70,13 @@ void setup() {
   digitalWrite(WASP_Power, HIGH);   // Set 5V to pin 10
   digitalWrite(WASP_Ground, LOW);   // Set GND to pin 11
   // Initialize the sensor
-  if(!accel.begin()) {
+  if(!accel.begin())
     exit(1);
-  }
+
   Serial.begin(57600);
   calibrate_end();
   calibrate_start();
 }
-
-double current_time   = 0;
-int current_increment = check_time();
-boolean afternoon = false;
-double phi;
 
 void loop() {
   current_increment = check_time();
@@ -84,52 +87,35 @@ void loop() {
    * SENSOR READINGS
    * Take 10 sample readings from the accelerometer, and take the average
    */
-  int x = 0; // x-axis
-  int y = 0; // y-axis
-  int z = 0; // z-axis
-  int i;
-  double phi; // Angle phi
-  double theta; // Angle theta
-  double rho; //Magnitude rho
+  // int x = 0; // x-axis
+  // int y = 0; // y-axis
+  // int z = 0; // z-axis
+  // int i;
+  // double phi; // Angle phi
+  // double theta; // Angle theta
+  // double rho; //Magnitude rho
 
-  for(i = 0; i < number_of_samples; i++) {
-    // Get a new sensor event
-    sensors_event_t event;
-    accel.getEvent(&event);
-    // Display the results (acceleration is measured in m/s^2)
-    accel_x[i] = event.acceleration.x;
-    accel_y[i] = event.acceleration.y;
-    accel_z[i] = event.acceleration.z;
-
-    x += accel_x[i]; // Sum of the x-axis
-    y += accel_y[i]; // Sum of the y-axis
-    z += accel_z[i]; // Sum of the z-axis
-
-
-    delay(sample_time_interval);
-  }
-
-  x /= number_of_samples; // Final value for x-axis
-  y /= number_of_samples; // Final value for y-axis
-  z /= number_of_samples; // Final value for z-axis
-  phi = vectors_to_phi(x, y, z);
 
   /*
      SOLAR PANEL MOVEMENT
-     The solar panel will tilt toward west if the sunlight intensity detected on
-     the west side of the panel is greater than the one detected on the east
-     side. The solar panel will tilt toward east if the sunlight intensity
-     detected on the east side is greater than the one detected on the west
-     side. However, if the readings from both side are similar, the solar panel
-     will remain stationary.
+     The solar panel will tilt if the angle of the panel is greater
+     than the margin of error.
    */
 
-  if(phi - sun_angles[current_increment] < -0.1) { // If the angle is greater than phi
-    forward(500); // Full speed forwards signal pushing the solar panel to the left(west) for 0.5 seconds
-  } else if(phi - sun_angles[current_increment] > 0.1) { // If the angle is greater than phi
-    backward(500); // Full speed backwards signal pulling the solar panel to the right(east) for 0.5 seconds
-  } else { // If the sunlight intensity is similar from both side of the panel
-    stop(500); // Stationary signal stop the solar panel from moving
+  int movement_duration = initial_adjustment_time;
+  double phi = get_phi(accel, number_of_samples, sample_time_interval);
+  double angle_difference = phi - sun_angles[current_increment];
+  bool direction = angle_difference > 0;
+  bool new_direction = direction;
+  int attempt_count = 0;
+  while(attempt_count < give_up && abs(angle_difference) > 0.1 && movement_duration) {
+    seek_position(direction, afternoon, movement_duration);
+    phi = get_phi(accel, number_of_samples, sample_time_interval);
+    angle_difference = phi - sun_angles[current_increment];
+    new_direction = angle_difference > 0;
+    if(new_direction != direction)
+      movement_duration /= 2;
+    direction = new_direction;
   }
   delay(solar_panel_adjustment_interval); // Delay before another adjustment will be made
 }
