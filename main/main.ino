@@ -110,6 +110,7 @@ void loop() {
   int attempt_count = 0;
   while(attempt_count < give_up && abs(angle_difference) > 0.1 && movement_duration) {
     seek_position(direction, afternoon, movement_duration);
+    delay(1000); // Delay a second so the actuator has time to settle
     phi = get_phi(accel, number_of_samples, sample_time_interval);
     angle_difference = phi - sun_angles[current_increment];
     new_direction = angle_difference > 0;
